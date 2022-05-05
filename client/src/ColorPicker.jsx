@@ -14,18 +14,23 @@ function ColorPicker() {
   const [groups, setGroups] = useState([]);
   const [activeGroupId, setActiveGroupId] = useState();
 
+  const getGroups = () => axios.get('/universes/1/groups')
+    .then((res) => {
+      setGroups(res.data);
+      return res.data;
+    });
+
   useEffect(() => {
-    axios.get('/universes/1/groups')
-      .then((res) => {
-        setGroups(res.data);
-        setActiveGroupId(res.data[0]?.id);
-      });
+    getGroups()
+      .then((data) => setActiveGroupId(data[0]?.id));
   }, []);
 
   useEffect(() => {
     if (groupButtons.current.querySelector('.inactiveGroup')) {
 
       groupButtons.current.querySelector('.inactiveGroup').style.backgroundColor = 'transparent';
+      groupButtons.current.querySelector('.activeGroup').style.backgroundColor = `rgba(255,255,255,0.4)`;
+
     }
   }, [activeGroupId]);
 
@@ -54,12 +59,13 @@ function ColorPicker() {
       red: rgb[0],
       green: rgb[1],
       blue: rgb[2],
-    }).then((res) => console.log(res.status));
+    });
 
     document.body.style.backgroundColor = color;
     dmxtra.current.style.color = color;
     pickerPointer.current.style.backgroundColor = color;
     groupButtons.current.querySelector('.activeGroup').style.backgroundColor = `hsla(${deg}, 100%, ${lightness}%, 0.3)`;
+    groupButtons.current.querySelector('.activeGroup > *').style.backgroundColor = color;
   };
 
   const handleColorPress = (e) => {
@@ -75,8 +81,7 @@ function ColorPicker() {
 
   const handleOff = (e) => {
     e.preventDefault();
-    axios.put(`/universes/1/groups/${activeGroupId}/off`)
-      .then((res) => console.log(res.status));
+    axios.put(`/universes/1/groups/${activeGroupId}/off`);
   };
 
   const handleGroupSelection = (id) => {
@@ -85,7 +90,7 @@ function ColorPicker() {
 
   return (
     <Controller>
-      <h1 ref={dmxtra}>DMXtra</h1>
+      <Title ref={dmxtra}>MNMT</Title>
       <PickerWrapperWrapper>
         <PickerWrapper>
           <Picker ref={picker} onMouseDown={(e) => handleColorPress(e)}>
@@ -95,13 +100,17 @@ function ColorPicker() {
           </Picker>
         </PickerWrapper>
       </PickerWrapperWrapper>
-      <OffButton onClick={(e) => handleOff(e)}>Off</OffButton>
+      {/* <OffButton onClick={(e) => handleOff(e)}>Off</OffButton> */}
       <GroupButtons ref={groupButtons}>
         {groups.map((group) => (
           <GroupButton
             className={activeGroupId === group.id ? 'activeGroup' : 'inactiveGroup'}
             onClick={() => handleGroupSelection(group.id)}
             key={group.id}
+            red={group.red}
+            green={group.green}
+            blue={group.blue}
+            brightness={group.brightness / 255}
           >
             <GroupSwatch />
             {group.name}
@@ -111,6 +120,13 @@ function ColorPicker() {
     </Controller>
   );
 }
+
+const Title = styled.h1`
+  font-size: 4em;
+  text-align: center;
+  color: white;
+  margin-top: 20px;
+`;
 
 const PickerWrapperWrapper = styled.div`
   width: 100%;
@@ -124,7 +140,6 @@ const GroupSwatch = styled.span`
   height: 75px;
   border-radius: 50%;
   border: 3px solid white;
-  background-color: red;
   box-shadow: 0px 8px 20px rgba(47, 47, 47, 0.58);
 `;
 
@@ -132,17 +147,32 @@ const GroupButtons = styled.div`
   display: flex;
   width: 100%;
   justify-content: center;
+  position: absolute;
+  bottom: 20px;
 `;
 
 const GroupButton = styled.div`
   width: 100px;
-  height: 150px;
-  border: 2px solid white;
+  height: 130px;
   margin: 5px;
   border-radius: 10px;
   color: white;
   padding: 5px;
+  background-color: rgba(${(props) => (props.red + ', ' + props.green + ', ' + props.blue + ', 0.5')});
+  & > ${GroupSwatch} {
+    background-color: rgba(${(props) => (props.red + ', ' + props.green + ', ' + props.blue)});
+  }
   box-shadow: 0px 8px 20px rgba(47, 47, 47, 0.58);
+  text-align: center;
+  padding-top: 10px;
+  &:hover > ${GroupSwatch} {
+    transform: scale(1.03);
+    transition: transform 0.1s ease-in-out;
+  }
+  &:active > ${GroupSwatch} {
+    transform: scale(0.98);
+    transition: transform 0.1s ease-in-out;
+  }
 `;
 
 const OffButton = styled.button`
@@ -150,11 +180,11 @@ const OffButton = styled.button`
 
 const Controller = styled.section`
   position: absolute;
-  background-color: #333;
-  top: 5px;
-  bottom: 5px;
-  left: 5px;
-  right: 5px;
+  background-color: #222;
+  top: 12px;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
   border-radius: 5px;
   /* display: flex;
   align-items: center;
@@ -164,12 +194,14 @@ const Controller = styled.section`
 const Pointer = styled.span`
   width: 50px;
   height: 50px;
+  top: 30%;
+  left: 30%;
   position: absolute;
   display: inline-block;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  border: 5px solid white;
-  /* background-color: red; */
+  border: 3px solid white;
+  box-shadow: 0px 8px 10px rgba(47, 47, 47, 0.38);
 `;
 
 const PickerWrapper = styled.div`
@@ -177,6 +209,7 @@ const PickerWrapper = styled.div`
   position: relative;
   width: 300px;
   height: 300px;
+  margin-top: 20px;
 `;
 
 const Picker = styled.div`
@@ -184,7 +217,7 @@ const Picker = styled.div`
   height: 100%;
   position: absolute;
   border-radius: 50%;
-  border: 5px solid white;
+  border: 3px solid white;
   box-shadow: 0px 8px 30px rgba(47, 47, 47, 0.38);
 `;
 

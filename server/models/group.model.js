@@ -9,6 +9,12 @@ const fixturesQuery = `
     WHERE groups_fixtures.group_id = $1;
 `;
 
+const groupUpdateQuery = `
+  UPDATE groups
+    SET red = $1, green = $2, blue = $3, brightness = $4
+    WHERE groups.id = $5;
+`;
+
 const allQuery = `
   SELECT *
   FROM groups;
@@ -18,6 +24,7 @@ class Group {
   constructor(groupId, fixtures) {
     this.fixtures = fixtures.rows;
     this.name = null;
+    this.id = groupId;
   }
 
   static async find(id) {
@@ -39,6 +46,8 @@ class Group {
       universe.prepChannel(fixture.brightness - 1, 150);
     });
     universe.transmit();
+
+    db.result(groupUpdateQuery, [attributes.red, attributes.green, attributes.blue, 150, this.id]);
   }
 
   turnOff() {
