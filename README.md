@@ -1,5 +1,7 @@
 # DMXtra
 
+<img width="479" alt="Screen Shot 2022-05-04 at 10 46 28 PM" src="https://user-images.githubusercontent.com/67052402/166868957-99503a9a-33ec-4ece-b1af-854273d40c1f.png">
+
 DMXtra is a web-based controller for DMX lights.
 
 ## Getting Started
