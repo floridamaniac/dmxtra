@@ -35,11 +35,6 @@ class Group {
       Object.keys(attributes).forEach((attribute) => {
         universe.prepChannel(fixture[attribute] - 1, attributes[attribute]);
       });
-      // All channels need to be mapped by -1
-      // Temperature is actually shutter
-      // Default curve is actually shutter default
-      // Dimming curve is irrelevant
-      // Missing prop for temperature
       universe.prepChannel(fixture.shutter - 1, fixture.shutter_default);
       universe.prepChannel(fixture.brightness - 1, 150);
     });
@@ -48,7 +43,7 @@ class Group {
 
   turnOff() {
     this.fixtures.forEach((fixture) => {
-      universe.prepChannel(fixture.white, 0);
+      universe.prepChannel(fixture.brightness - 1, 0);
     });
     universe.transmit();
   }

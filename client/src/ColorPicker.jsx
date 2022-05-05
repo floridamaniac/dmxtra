@@ -46,7 +46,6 @@ function ColorPicker() {
 
     document.body.style.backgroundColor = color;
     dmxtra.current.style.color = color;
-    // picker.current.style.borderColor = color;
     pickerPointer.current.style.backgroundColor = color;
   };
 
@@ -59,6 +58,12 @@ function ColorPicker() {
     picker.current.addEventListener('mouseleave', () => {
       picker.current.removeEventListener('mousemove', handleColorSelection);
     });
+  };
+
+  const handleOff = (e) => {
+    e.preventDefault();
+    axios.put('/universes/1/groups/2/off')
+      .then((res) => console.log(res.status));
   };
 
   return (
@@ -76,9 +81,13 @@ function ColorPicker() {
           <Pointer ref={pickerPointer} />
         </Picker>
       </PickerWrapper>
+      <OffButton onClick={(e) => handleOff(e)}>Off</OffButton>
     </Controller>
   );
 }
+
+const OffButton = styled.button`
+`;
 
 const Controller = styled.section`
   position: absolute;
