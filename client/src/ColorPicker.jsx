@@ -31,11 +31,11 @@ function ColorPicker() {
 
     placePointer(e);
     const rgb = convert.hsl.rgb(deg, 100, lightness);
-    axios.post('/fixtures', {
-      r: rgb[0],
-      g: rgb[1],
-      b: rgb[2],
-    }).then((res) => console.log(res));
+    axios.put('/universe/1/groups/1/transmit', {
+      red: rgb[0],
+      green: rgb[1],
+      blue: rgb[2],
+    }).then((res) => console.log(res.status));
 
     document.body.style.backgroundColor = color;
     dmxtra.current.style.color = color;
