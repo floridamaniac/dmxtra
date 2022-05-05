@@ -40,8 +40,8 @@ class Group {
       // Default curve is actually shutter default
       // Dimming curve is irrelevant
       // Missing prop for temperature
-      universe.prepChannel(fixture.temperature - 1, fixture.default_curve);
-      universe.prepChannel(fixture.white - 1, 150);
+      universe.prepChannel(fixture.shutter - 1, fixture.shutter_default);
+      universe.prepChannel(fixture.brightness - 1, 150);
     });
     universe.transmit();
   }

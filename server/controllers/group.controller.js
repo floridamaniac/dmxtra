@@ -9,6 +9,7 @@ module.exports = {
   },
   listAll: async (req, res) => {
     const groups = await Group.all();
-    res.send(groups);
+    console.log(groups.rows);
+    res.send(groups.rows);
   },
 };
